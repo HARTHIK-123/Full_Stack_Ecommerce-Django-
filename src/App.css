@@ -1,0 +1,224 @@
+/* #root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+} */
+
+
+/* body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  min-height: 100vh;
+  justify-content: center;
+  align-items: center;
+  background-color: blueviolet;
+  
+  
+  
+}
+.login-con{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100px;
+  
+
+} 
+.login-con input{
+  width: 250px;
+  height:50px;
+}
+
+
+h1{
+margin: 30px 0;         
+  color: #333;
+  font-size: 45px;
+  text-align: center;    
+  position: absolute;   
+  top: 20px;             
+  left: 43%;
+  background-color: aqua;
+}
+
+button {
+  width: 260%;
+  padding: 12px;
+  margin-top: 15px;
+  border: none;
+  border-radius: 8px;
+  background-color: rgb(18, 178, 52);
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  
+}
+.footer {
+  position: fixed;   
+  bottom: 0;         
+  left: 0;           
+  width: 100%;       
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  text-align: center;
+  padding: 10px;
+  font-size: 14px;
+} */
+
+/* General Body and Page Wrapper */
+body {
+    background-color: #f0f2f5; /* Light gray background */
+    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    margin: 0;
+    height: 100vh;
+}
+
+/* Full-screen wrapper */
+.auth-page-wrapper {
+    background: linear-gradient(135deg, #6dd5ed, #2193b0); /* Beautiful gradient */
+    min-height: 100vh;
+    width: 100vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0; /* Remove padding to occupy full screen */
+    box-sizing: border-box;
+}
+
+/* Full-screen Card */
+.custom-card-login, .custom-card-signup {
+    border-radius: 0; /* Remove rounded corners to fit the screen */
+    border: none;
+    box-shadow: none; /* Optional: remove shadow for full-screen look */
+    overflow: hidden;
+    background: white;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    max-width: 100%; /* Prevent max width constraint */
+    max-height: 100%; /* Prevent max height constraint */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Center content vertically */
+    align-items: center; /* Center content horizontally */
+    padding: 40px; /* Optional padding inside card */
+}
+
+/* Card Title */
+.card-title-custom {
+    font-weight: 700;
+    color: #343a40;
+    margin-bottom: 20px;
+}
+
+/* Input Group Styling */
+.input-group-custom .input-icon-bg {
+    background-color: #e9ecef;
+    border: 1px solid #ced4da;
+    border-right: none;
+    color: #495057;
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.input-group-custom .form-control-custom {
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+    border-left: none;
+    height: calc(2.25rem + 10px);
+    padding: 0.75rem 1rem;
+}
+
+.input-group-custom .form-control-custom:focus {
+    box-shadow: 0 0 0 0.25rem rgba(33, 147, 176, 0.25);
+    border-color: #2193b0;
+}
+
+/* Custom Button Styling */
+.btn-custom-primary {
+    background-color: #2193b0;
+    border-color: #2193b0;
+    border-radius: 8px;
+    font-weight: 600;
+    padding: 10px 20px;
+    transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-custom-primary:hover {
+    background-color: #1a7e93;
+    border-color: #1a7e93;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-custom-primary:active {
+    background-color: #125e6e !important;
+    border-color: #125e6e !important;
+    transform: translateY(0px);
+}
+
+/* Link Styling */
+a {
+    color: #2193b0;
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #1a7e93;
+}
+
+/* Horizontal Rule */
+hr {
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+/* Responsive adjustments */
+@media (max-width: 767.98px) {
+    .custom-card-login, .custom-card-signup {
+        padding: 20px;
+    }
+}
+
