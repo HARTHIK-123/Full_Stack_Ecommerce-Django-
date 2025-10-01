@@ -1,100 +1,9 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { Navbar } from "./Navbar";
 import { Sidebar } from "./Sidebar";
 
 const NAVBAR_HEIGHT = 70;
 const SIDEBAR_WIDTH = 200;
-
-function UserList() {
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    axios
-      .get("http://127.0.0.1:8000/website/api/users/")
-      .then((res) => {
-        setUsers(res.data);
-        setLoading(false);
-      })
-      .catch(() => {
-        setError("Failed to load users");
-        setLoading(false);
-      });
-  }, []);
-
-  if (loading) return <div>Loading users...</div>;
-  if (error) return <div>{error}</div>;
-
-  return (
-    <div style={{ background: "white", padding: 20, borderRadius: 10, boxShadow: "0 6px 12px rgba(0,0,0,0.1)", height: "100%", boxSizing: "border-box" }}>
-      <h2 style={{ color: "#2c3e50", marginTop: 0 }}>User List</h2>
-      <div style={{ overflowX: "auto", maxHeight: "calc(100vh - 180px)" }}>
-        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "16px", minWidth: "600px" }}>
-          <thead>
-            <tr style={{ background: "#34495e", color: "white" }}>
-              <th style={{ padding: "10px", border: "1px solid #ccc" }}>ID</th>
-              <th style={{ padding: "10px", border: "1px solid #ccc" }}>Username</th>
-              <th style={{ padding: "10px", border: "1px solid #ccc" }}>Email</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((u) => (
-              <tr key={u.id}>
-                <td style={{ padding: "10px", border: "1px solid #ccc" }}>{u.id}</td>
-                <td style={{ padding: "10px", border: "1px solid #ccc" }}>{u.username}</td>
-                <td style={{ padding: "10px", border: "1px solid #ccc" }}>{u.email || "N/A"}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-}
-
-function AddUserForm({ onUserAdded }) {
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = () => {
-    if (!username || !email || !password) {
-      alert("Please fill all fields");
-      return;
-    }
-
-    setLoading(true);
-    axios
-      .post("http://127.0.0.1:8000/website/api/signup/", { username, email, password })
-      .then(() => {
-        alert("User created successfully!");
-        setUsername("");
-        setEmail("");
-        setPassword("");
-        setLoading(false);
-        if (onUserAdded) onUserAdded();
-      })
-      .catch(() => {
-        alert("Failed to create user. Username or email might be already used.");
-        setLoading(false);
-      });
-  };
-
-  return (
-    <div style={{ background: "white", padding: 20, borderRadius: 10, boxShadow: "0 6px 12px rgba(0,0,0,0.1)", maxWidth: 500, boxSizing: "border-box" }}>
-      <h2 style={{ color: "#2c3e50", marginTop: 0 }}>Add User</h2>
-      <input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} style={{ width: "100%", padding: "10px", marginBottom: "10px", borderRadius: "6px", border: "1px solid #ccc" }} />
-      <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} style={{ width: "100%", padding: "10px", marginBottom: "10px", borderRadius: "6px", border: "1px solid #ccc" }} />
-      <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} style={{ width: "100%", padding: "10px", marginBottom: "20px", borderRadius: "6px", border: "1px solid #ccc" }} />
-      <button onClick={handleSubmit} disabled={loading} style={{ width: "100%", padding: "10px", background: "#27ae60", color: "white", fontWeight: "bold", border: "none", borderRadius: "6px", cursor: "pointer" }}>
-        {loading ? "Creating..." : "Create User"}
-      </button>
-    </div>
-  );
-}
 
 export function Dashboard({ onLogout }) {
   const [products, setProducts] = useState([]);
@@ -105,10 +14,17 @@ export function Dashboard({ onLogout }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [cart, setCart] = useState([]);
   const [showCart, setShowCart] = useState(false);
-  const API_URL = "http://127.0.0.1:8000/website/api/products/";
 
+  // Fetch products initially (just a few dummy items for testing)
   useEffect(() => {
-    if (selectedPage === "Products") getProducts();
+    if (selectedPage === "Products") {
+      const initialProducts = [
+        { id: 1, name: "Laptop", description: "High performance", price: 80000 },
+        { id: 2, name: "Phone", description: "Latest model", price: 50000 }
+      ];
+      setProducts(initialProducts);
+      setFilteredProducts(initialProducts);
+    }
   }, [selectedPage]);
 
   useEffect(() => {
@@ -122,19 +38,10 @@ export function Dashboard({ onLogout }) {
     }
   }, [searchTerm, products]);
 
-  const getProducts = () => {
-    axios
-      .get(API_URL)
-      .then((res) => {
-        setProducts(res.data);
-        setFilteredProducts(res.data);
-      })
-      .catch((err) => console.error("Error fetching products:", err));
-  };
-
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
+  // ✅ FRONTEND ONLY ADD/EDIT
   const handleSubmit = () => {
     if (!form.name || !form.description || !form.price) {
       alert("Please fill all fields");
@@ -142,25 +49,24 @@ export function Dashboard({ onLogout }) {
     }
 
     if (editingProduct) {
-      axios
-        .put(`${API_URL}${editingProduct.id}/`, form)
-        .then((res) => {
-          const updatedProducts = products.map((p) =>
-            p.id === editingProduct.id ? res.data : p
-          );
-          setProducts(updatedProducts);
-          setForm({ name: "", description: "", price: "" });
-          setEditingProduct(null);
-        })
-        .catch((err) => console.error("Error updating product:", err));
+      // Update product locally
+      const updatedProducts = products.map((p) =>
+        p.id === editingProduct.id ? { ...editingProduct, ...form } : p
+      );
+      setProducts(updatedProducts);
+      setFilteredProducts(updatedProducts);
+      setForm({ name: "", description: "", price: "" });
+      setEditingProduct(null);
     } else {
-      axios
-        .post(API_URL, form)
-        .then((res) => {
-          setProducts([...products, res.data]);
-          setForm({ name: "", description: "", price: "" });
-        })
-        .catch((err) => console.error("Error adding product:", err));
+      // Add product locally
+      const newProduct = {
+        id: products.length ? Math.max(...products.map((p) => p.id)) + 1 : 1,
+        ...form,
+      };
+      const newProducts = [...products, newProduct];
+      setProducts(newProducts);
+      setFilteredProducts(newProducts);
+      setForm({ name: "", description: "", price: "" });
     }
   };
 
@@ -173,12 +79,12 @@ export function Dashboard({ onLogout }) {
     });
   };
 
+  // ✅ FRONTEND ONLY DELETE
   const handleDelete = (id) => {
     if (!window.confirm("Are you sure you want to delete this product?")) return;
-    axios
-      .delete(`${API_URL}${id}/`)
-      .then(() => setProducts(products.filter((p) => p.id !== id)))
-      .catch((err) => console.error("Error deleting product:", err));
+    const newProducts = products.filter((p) => p.id !== id);
+    setProducts(newProducts);
+    setFilteredProducts(newProducts);
   };
 
   // ADD TO CART
@@ -278,227 +184,176 @@ export function Dashboard({ onLogout }) {
           boxSizing: "border-box",
         }}
       >
-        {selectedPage === "UserList" ? (
-          <UserList />
-        ) : selectedPage === "AddUser" ? (
-          <AddUserForm onUserAdded={() => setSelectedPage("UserList")} />
-        ) : (
-          <>
-            <h2 style={{ color: "#2c3e50", marginTop: 0 }}>
-              {editingProduct ? "Edit Product" : "Add Product"}
-            </h2>
-            <div
-              style={{
-                marginBottom: "20px",
-                display: "flex",
-                flexWrap: "wrap",
-                gap: "10px",
-              }}
-            >
-              <input
-                type="text"
-                name="name"
-                value={form.name}
-                onChange={handleChange}
-                placeholder="Product Name"
-                style={{
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  flex: "2 1 180px",
-                  minWidth: "120px",
-                }}
-              />
-              <input
-                type="text"
-                name="description"
-                value={form.description}
-                onChange={handleChange}
-                placeholder="Description"
-                style={{
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  flex: "4 1 260px",
-                  minWidth: "180px",
-                }}
-              />
-              <input
-                type="number"
-                name="price"
-                value={form.price}
-                onChange={handleChange}
-                placeholder="Price"
-                style={{
-                  padding: "10px",
-                  border: "1px solid #ccc",
-                  width: "90px",
-                  minWidth: "70px",
-                }}
-              />
-              <button
-                onClick={handleSubmit}
-                style={{
-                  padding: "10px 22px",
-                  border: "none",
-                  borderRadius: "6px",
-                  background: editingProduct ? "#f39c12" : "#27ae60",
-                  color: "white",
-                  fontWeight: "bold",
-                  cursor: "pointer",
-                  minWidth: "110px",
-                }}
-              >
-                {editingProduct ? "✏️ Update" : "➕ Add"}
-              </button>
-            </div>
-
-            <h2 style={{ color: "#2c3e50" }}>Product List</h2>
-            <div
-              style={{
-                width: "100%",
-                flex: 1,
-                overflowX: "auto",
-                background: "white",
-                marginBottom: "12px",
-              }}
-            >
-              <table
-                style={{
-                  width: "100%",
-                  borderCollapse: "collapse",
-                  fontSize: "16px",
-                  minWidth: "600px",
-                }}
-              >
-                <thead>
-                  <tr style={{ background: "#34495e", color: "white" }}>
-                    <th style={{ padding: "10px", border: "1px solid #ccc" }}>
-                      Product Name
-                    </th>
-                    <th style={{ padding: "10px", border: "1px solid #ccc" }}>
-                      Description
-                    </th>
-                    <th style={{ padding: "10px", border: "1px solid #ccc" }}>
-                      Price
-                    </th>
-                    <th style={{ padding: "10px", border: "1px solid #ccc" }}>
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredProducts.length === 0 ? (
-                    <tr>
-                      <td
-                        colSpan="4"
-                        style={{
-                          padding: "10px",
-                          textAlign: "center",
-                          color: "#7f8c8d",
-                        }}
-                      >
-                        No products found.
-                      </td>
-                    </tr>
-                  ) : (
-                    filteredProducts.map((p) => (
-                      <tr key={p.id}>
-                        <td style={{ padding: "10px", border: "1px solid #ccc" }}>{p.name}</td>
-                        <td style={{ padding: "10px", border: "1px solid #ccc" }}>{p.description}</td>
-                        <td style={{ padding: "10px", border: "1px solid #ccc" }}>₹{p.price}</td>
-                        <td style={{ padding: "10px", border: "1px solid #ccc" }}>
-                          <button
-                            onClick={() => handleEdit(p)}
-                            style={{
-                              marginRight: "8px",
-                              padding: "5px 10px",
-                              background: "#f39c12",
-                              color: "white",
-                              border: "none",
-                              borderRadius: "4px",
-                              cursor: "pointer",
-                            }}
-                          >
-                            ✏️ Edit
-                          </button>
-                          <button
-                            onClick={() => handleDelete(p.id)}
-                            style={{
-                              padding: "5px 10px",
-                              background: "#e74c3c",
-                              color: "white",
-                              border: "none",
-                              borderRadius: "4px",
-                              cursor: "pointer",
-                              marginRight: "8px",
-                            }}
-                          >
-                            🗑️ Delete
-                          </button>
-                          <button
-                            onClick={() => handleAddToCart(p)}
-                            style={{
-                              padding: "5px 10px",
-                              background: "#2980b9",
-                              color: "white",
-                              border: "none",
-                              borderRadius: "4px",
-                              cursor: "pointer"
-                            }}
-                          >
-                            🛒 Add to Cart
-                          </button>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </>
-        )}
-        {/* CART MODAL */}
-        {showCart && (
-          <div
+        <h2 style={{ color: "#2c3e50", marginTop: 0 }}>
+          {editingProduct ? "Edit Product" : "Add Product"}
+        </h2>
+        <div
+          style={{
+            marginBottom: "20px",
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "10px",
+          }}
+        >
+          <input
+            type="text"
+            name="name"
+            value={form.name}
+            onChange={handleChange}
+            placeholder="Product Name"
             style={{
-              position: "fixed",
-              top: "90px",
-              right: "40px",
-              background: "white",
-              padding: "24px",
-              borderRadius: "12px",
-              boxShadow: "0 4px 24px rgba(0,0,0,0.14)",
-              zIndex: 1500,
-              minWidth: "320px"
+              padding: "10px",
+              border: "1px solid #ccc",
+              flex: "2 1 180px",
+              minWidth: "120px",
+            }}
+          />
+          <input
+            type="text"
+            name="description"
+            value={form.description}
+            onChange={handleChange}
+            placeholder="Description"
+            style={{
+              padding: "10px",
+              border: "1px solid #ccc",
+              flex: "4 1 260px",
+              minWidth: "180px",
+            }}
+          />
+          <input
+            type="number"
+            name="price"
+            value={form.price}
+            onChange={handleChange}
+            placeholder="Price"
+            style={{
+              padding: "10px",
+              border: "1px solid #ccc",
+              width: "90px",
+              minWidth: "70px",
+            }}
+          />
+          <button
+            onClick={handleSubmit}
+            style={{
+              padding: "10px 22px",
+              border: "none",
+              borderRadius: "6px",
+              background: editingProduct ? "#f39c12" : "#27ae60",
+              color: "white",
+              fontWeight: "bold",
+              cursor: "pointer",
+              minWidth: "110px",
             }}
           >
-            <h3>🛒 Cart</h3>
-            {cart.length === 0 ? (
-              <div>Your cart is empty.</div>
-            ) : (
-              <ul style={{ paddingLeft: 18 }}>
-                {cart.map(item => (
-                  <li key={item.id} style={{ marginBottom: "10px" }}>
-                    {item.name} × {item.count} (₹{item.price})
-                    <button onClick={() => handleRemoveOneFromCart(item.id)}
-                      style={{
-                        background: "#e67e22", color: "white", border: "none", borderRadius: "4px", padding: "4px 10px", marginLeft: "10px", cursor: "pointer"
-                      }}>Remove One</button>
-                    <button onClick={() => handleRemoveFromCart(item.id)}
-                      style={{
-                        background: "#e74c3c", color: "white", border: "none", borderRadius: "4px", padding: "4px 10px", marginLeft: "6px", cursor: "pointer"
-                      }}>Remove All</button>
-                  </li>
-                ))}
-              </ul>
-            )}
-            <button
-              onClick={() => setShowCart(false)}
-              style={{
-                marginTop: 16, background: "#34495e", color: "white",
-                border: "none", borderRadius: "6px", padding: "7px 22px", cursor: "pointer"
-              }}>Close</button>
-          </div>
-        )}
+            {editingProduct ? "✏ Update" : "➕ Add"}
+          </button>
+        </div>
+
+        <h2 style={{ color: "#2c3e50" }}>Product List</h2>
+        <div
+          style={{
+            width: "100%",
+            flex: 1,
+            overflowX: "auto",
+            background: "white",
+            marginBottom: "12px",
+          }}
+        >
+          <table
+            style={{
+              width: "100%",
+              borderCollapse: "collapse",
+              fontSize: "16px",
+              minWidth: "600px",
+            }}
+          >
+            <thead>
+              <tr style={{ background: "#34495e", color: "white" }}>
+                <th style={{ padding: "10px", border: "1px solid #ccc" }}>
+                  Product Name
+                </th>
+                <th style={{ padding: "10px", border: "1px solid #ccc" }}>
+                  Description
+                </th>
+                <th style={{ padding: "10px", border: "1px solid #ccc" }}>
+                  Price
+                </th>
+                <th style={{ padding: "10px", border: "1px solid #ccc" }}>
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredProducts.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan="4"
+                    style={{
+                      padding: "10px",
+                      textAlign: "center",
+                      color: "#7f8c8d",
+                    }}
+                  >
+                    No products found.
+                  </td>
+                </tr>
+              ) : (
+                filteredProducts.map((p) => (
+                  <tr key={p.id}>
+                    <td style={{ padding: "10px", border: "1px solid #ccc" }}>{p.name}</td>
+                    <td style={{ padding: "10px", border: "1px solid #ccc" }}>{p.description}</td>
+                    <td style={{ padding: "10px", border: "1px solid #ccc" }}>₹{p.price}</td>
+                    <td style={{ padding: "10px", border: "1px solid #ccc" }}>
+                      <button
+                        onClick={() => handleEdit(p)}
+                        style={{
+                          marginRight: "8px",
+                          padding: "5px 10px",
+                          background: "#f39c12",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "4px",
+                          cursor: "pointer",
+                        }}
+                      >
+                        ✏ Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(p.id)}
+                        style={{
+                          padding: "5px 10px",
+                          background: "#e74c3c",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "4px",
+                          cursor: "pointer",
+                          marginRight: "8px",
+                        }}
+                      >
+                        🗑 Delete
+                      </button>
+                      <button
+                        onClick={() => handleAddToCart(p)}
+                        style={{
+                          padding: "5px 10px",
+                          background: "#2980b9",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "4px",
+                          cursor: "pointer"
+                        }}
+                      >
+                        🛒 Add to Cart
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Footer */}
