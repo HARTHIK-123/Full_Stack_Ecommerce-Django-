@@ -13,7 +13,8 @@ function UserList() {
 
   useEffect(() => {
     axios
-      .get("http://127.0.0.1:8000/website/api/users/")
+      // .get("http://127.0.0.1:8000/website/api/users/")
+      .get("https://full-stack-ecommerce-django-backend.onrender.com/website/api/users/")
       .then((res) => {
         setUsers(res.data);
         setLoading(false);
@@ -68,7 +69,8 @@ function AddUserForm({ onUserAdded }) {
 
     setLoading(true);
     axios
-      .post("http://127.0.0.1:8000/website/api/signup/", { username, email, password })
+      // .post("http://127.0.0.1:8000/website/api/signup/", { username, email, password })
+      .post("https://full-stack-ecommerce-django-backend.onrender.com/website/api/signup/", { username, email, password })
       .then(() => {
         alert("User created successfully!");
         setUsername("");
@@ -107,8 +109,8 @@ export function Dashboard({ onLogout }) {
   const [showCart, setShowCart] = useState(false);
 
   // If you later want to switch to backend-driven CRUD, change this constant.
-  const API_URL = "http://127.0.0.1:8000/website/api/products/";
-
+  // const API_URL = "http://127.0.0.1:8000/website/api/products/";
+  const API_URL = "https://full-stack-ecommerce-django-backend.onrender.com/website/api/products/";
   useEffect(() => {
     if (selectedPage === "Products") getProducts();
   }, [selectedPage]);
