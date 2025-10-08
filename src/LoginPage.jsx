@@ -17,7 +17,7 @@ export function LoginPage({ onLogin }) {
     }
 
     axios
-      .post("http://127.0.0.1:8000/website/api/login/", {
+      .post("https://full-stack-ecommerce-django-backend.onrender.com/website/api/login/", {
         username,
         password,
       })
@@ -48,7 +48,7 @@ export function LoginPage({ onLogin }) {
     }
 
     axios
-      .post("http://127.0.0.1:8000/website/api/signup/", {
+      .post("https://full-stack-ecommerce-django-backend.onrender.com/website/api/signup/", {
         username,
         email,    // include email here
         password,

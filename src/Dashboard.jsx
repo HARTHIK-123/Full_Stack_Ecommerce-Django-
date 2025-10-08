@@ -555,3 +555,299 @@ export function Dashboard({ onLogout }) {
     </div>
   );
 }
+
+// import { useState, useEffect } from "react";
+// import axios from "axios";
+// import { Navbar } from "./Navbar";
+// // import { Sidebar } from "./Sidebar";
+
+// const API_URL = "https://full-stack-ecommerce-django-backend.onrender.com/website/api/products/";
+
+// export function Dashboard({ onLogout }) {
+//   const [products, setProducts] = useState([]);
+//   const [form, setForm] = useState({ name: "", description: "", price: "" });
+//   const [editingProduct, setEditingProduct] = useState(null);
+//   const [search, setSearch] = useState("");
+//   const [cart, setCart] = useState([]);
+
+//   // ✅ Fetch products from backend
+//   const getProducts = async () => {
+//     try {
+//       const res = await axios.get(API_URL);
+//       setProducts(res.data);
+//     } catch (err) {
+//       console.error("Error fetching products:", err);
+//     }
+//   };
+
+//   useEffect(() => {
+//     getProducts();
+//   }, []);
+
+//   // ✅ Add / Update product
+//   const handleSubmit = async () => {
+//     if (!form.name || !form.description || !form.price) {
+//       alert("Please fill all fields");
+//       return;
+//     }
+
+//     try {
+//       if (editingProduct) {
+//         const res = await axios.put(`${API_URL}${editingProduct.id}/`, form);
+//         const updated = products.map((p) =>
+//           p.id === editingProduct.id ? res.data : p
+//         );
+//         setProducts(updated);
+//         setEditingProduct(null);
+//         alert("Product updated!");
+//       } else {
+//         const res = await axios.post(API_URL, form);
+//         setProducts([...products, res.data]);
+//         alert("Product added!");
+//       }
+//       setForm({ name: "", description: "", price: "" });
+//     } catch (err) {
+//       console.error("Error saving product:", err);
+//       alert("Failed to save product");
+//     }
+//   };
+
+//   // ✅ Delete product
+//   const handleDelete = async (id) => {
+//     if (!window.confirm("Are you sure you want to delete this product?")) return;
+//     try {
+//       await axios.delete(`${API_URL}${id}/`);
+//       setProducts(products.filter((p) => p.id !== id));
+//       alert("Product deleted!");
+//     } catch (err) {
+//       console.error("Error deleting product:", err);
+//       alert("Failed to delete product");
+//     }
+//   };
+
+//   const handleEdit = (product) => {
+//     setEditingProduct(product);
+//     setForm({
+//       name: product.name,
+//       description: product.description,
+//       price: product.price,
+//     });
+//   };
+
+//   // ✅ Cart Functions
+//   const addToCart = (product) => {
+//     const existing = cart.find((item) => item.id === product.id);
+//     if (existing) {
+//       setCart(
+//         cart.map((item) =>
+//           item.id === product.id
+//             ? { ...item, quantity: item.quantity + 1 }
+//             : item
+//         )
+//       );
+//     } else {
+//       setCart([...cart, { ...product, quantity: 1 }]);
+//     }
+//   };
+
+//   const removeOne = (id) => {
+//     const existing = cart.find((item) => item.id === id);
+//     if (!existing) return;
+//     if (existing.quantity > 1) {
+//       setCart(
+//         cart.map((item) =>
+//           item.id === id ? { ...item, quantity: item.quantity - 1 } : item
+//         )
+//       );
+//     } else {
+//       setCart(cart.filter((item) => item.id !== id));
+//     }
+//   };
+
+//   const removeAll = (id) => {
+//     setCart(cart.filter((item) => item.id !== id));
+//   };
+
+//   const total = cart.reduce(
+//     (sum, item) => sum + item.price * item.quantity,
+//     0
+//   );
+
+//   const filteredProducts = products.filter((p) =>
+//     p.name.toLowerCase().includes(search.toLowerCase())
+//   );
+
+//   return (
+//     <div className="flex h-screen">
+//       <Sidebar />
+//       <div className="flex-1 flex flex-col">
+//         <Navbar onLogout={onLogout} />
+
+//         <div className="p-6 overflow-y-auto">
+//           <h1 className="text-2xl font-bold mb-4">Products Dashboard</h1>
+
+//           {/* ✅ Search Bar */}
+//           <div className="mb-4 flex justify-between items-center">
+//             <input
+//               type="text"
+//               placeholder="Search..."
+//               className="border rounded px-3 py-2 mr-2"
+//               value={search}
+//               onChange={(e) => setSearch(e.target.value)}
+//             />
+
+//             <div className="text-lg font-semibold">
+//               🛒 Cart Items: {cart.length} | Total: ₹{total.toFixed(2)}
+//             </div>
+//           </div>
+
+//           {/* ✅ Add / Edit Form */}
+//           <div className="bg-white p-4 rounded shadow-md mb-6">
+//             <h2 className="text-xl font-semibold mb-3">
+//               {editingProduct ? "Edit Product" : "Add Product"}
+//             </h2>
+
+//             <input
+//               type="text"
+//               placeholder="Name"
+//               className="border rounded px-3 py-2 w-full mb-2"
+//               value={form.name}
+//               onChange={(e) => setForm({ ...form, name: e.target.value })}
+//             />
+//             <input
+//               type="text"
+//               placeholder="Description"
+//               className="border rounded px-3 py-2 w-full mb-2"
+//               value={form.description}
+//               onChange={(e) =>
+//                 setForm({ ...form, description: e.target.value })
+//               }
+//             />
+//             <input
+//               type="number"
+//               placeholder="Price"
+//               className="border rounded px-3 py-2 w-full mb-2"
+//               value={form.price}
+//               onChange={(e) => setForm({ ...form, price: e.target.value })}
+//             />
+
+//             <button
+//               onClick={handleSubmit}
+//               className="bg-blue-500 text-white px-4 py-2 rounded mr-2"
+//             >
+//               {editingProduct ? "Update" : "Add"}
+//             </button>
+
+//             {editingProduct && (
+//               <button
+//                 onClick={() => {
+//                   setEditingProduct(null);
+//                   setForm({ name: "", description: "", price: "" });
+//                 }}
+//                 className="bg-gray-400 text-white px-4 py-2 rounded"
+//               >
+//                 Cancel
+//               </button>
+//             )}
+//           </div>
+
+//           {/* ✅ Products Table */}
+//           <table className="w-full border-collapse border">
+//             <thead>
+//               <tr className="bg-gray-200 text-left">
+//                 <th className="p-2 border">Name</th>
+//                 <th className="p-2 border">Description</th>
+//                 <th className="p-2 border">Price</th>
+//                 <th className="p-2 border">Actions</th>
+//               </tr>
+//             </thead>
+//             <tbody>
+//               {filteredProducts.map((product) => (
+//                 <tr key={product.id} className="border">
+//                   <td className="p-2 border">{product.name}</td>
+//                   <td className="p-2 border">{product.description}</td>
+//                   <td className="p-2 border">₹{product.price}</td>
+//                   <td className="p-2 border flex gap-2">
+//                     <button
+//                       onClick={() => handleEdit(product)}
+//                       className="bg-yellow-400 text-white px-3 py-1 rounded"
+//                     >
+//                       Edit
+//                     </button>
+//                     <button
+//                       onClick={() => handleDelete(product.id)}
+//                       className="bg-red-500 text-white px-3 py-1 rounded"
+//                     >
+//                       Delete
+//                     </button>
+//                     <button
+//                       onClick={() => addToCart(product)}
+//                       className="bg-green-500 text-white px-3 py-1 rounded"
+//                     >
+//                       Add to Cart
+//                     </button>
+//                   </td>
+//                 </tr>
+//               ))}
+
+//               {filteredProducts.length === 0 && (
+//                 <tr>
+//                   <td colSpan="4" className="text-center p-4">
+//                     No products found
+//                   </td>
+//                 </tr>
+//               )}
+//             </tbody>
+//           </table>
+
+//           {/* ✅ Cart Section */}
+//           <div className="mt-8 bg-gray-100 p-4 rounded shadow-md">
+//             <h2 className="text-xl font-semibold mb-3">🛍️ Cart</h2>
+
+//             {cart.length === 0 ? (
+//               <p>No items in cart.</p>
+//             ) : (
+//               <table className="w-full border-collapse border">
+//                 <thead>
+//                   <tr className="bg-gray-200 text-left">
+//                     <th className="p-2 border">Name</th>
+//                     <th className="p-2 border">Qty</th>
+//                     <th className="p-2 border">Price</th>
+//                     <th className="p-2 border">Total</th>
+//                     <th className="p-2 border">Actions</th>
+//                   </tr>
+//                 </thead>
+//                 <tbody>
+//                   {cart.map((item) => (
+//                     <tr key={item.id} className="border">
+//                       <td className="p-2 border">{item.name}</td>
+//                       <td className="p-2 border">{item.quantity}</td>
+//                       <td className="p-2 border">₹{item.price}</td>
+//                       <td className="p-2 border">
+//                         ₹{(item.price * item.quantity).toFixed(2)}
+//                       </td>
+//                       <td className="p-2 border flex gap-2">
+//                         <button
+//                           onClick={() => removeOne(item.id)}
+//                           className="bg-yellow-400 text-white px-3 py-1 rounded"
+//                         >
+//                           Remove One
+//                         </button>
+//                         <button
+//                           onClick={() => removeAll(item.id)}
+//                           className="bg-red-500 text-white px-3 py-1 rounded"
+//                         >
+//                           Remove All
+//                         </button>
+//                       </td>
+//                     </tr>
+//                   ))}
+//                 </tbody>
+//               </table>
+//             )}
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
